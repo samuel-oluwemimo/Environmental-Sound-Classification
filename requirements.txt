@@ -2,3 +2,6 @@ torch
 modal
 pandas
 torchaudio
+tqdm
+numpy
+tensorboard

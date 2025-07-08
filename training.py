@@ -4,13 +4,16 @@ from importlib.metadata import metadata
 import modal
 import torch
 import torchaudio
+import numpy as np
 from model import AudioCNN
 import pandas as pd
 import torch.nn as nn
 from pathlib import Path
+from torch.utils.tensorboard import SummaryWriter
 from torch.optim.lr_scheduler import OneCycleLR
 import torchaudio.transforms as T
 from torch.utils.data import DataLoader, Dataset
+from tqdm import tqdm
 
 app = modal.App("audio_cnn")
 
@@ -63,8 +66,30 @@ class Esc50Dataset(Dataset):
 
         return spectrogram, row["label"]
 
+def mixup_data(x,y):
+    """Apply mixup augmentation to the input data."""
+    alpha = 0.2
+    if alpha > 0:
+        lam = np.random.beta(alpha, alpha)
+        batch_size = x.size(0)
+        index = torch.randperm(batch_size).to(x.device)
+        mixed_x = lam * x + (1 - lam) * x[index, :]
+        y_a, y_b = y, y[index]
+        return mixed_x, y_a, y_b, lam
+    else:
+        return x, y, y, 1.0
+
+def mixup_criterion(criterion, pred, y_a, y_b, lam):
+    """Compute the mixup loss."""
+    return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
+
 @app.function(image=image, gpu="A10G", volumes={"/data": volume, "/models": model_volume}, timeout=60 * 60 * 3)
 def train():
+    from datetime import datetime
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+    log_dir = f'/models/tensorboards_logs/{timestamp}'
+    writer = SummaryWriter(log_dir=log_dir)
+
     esc50_dir = Path("/opt/esc50-data")
 
     train_transform = nn.Sequential(
@@ -121,8 +146,81 @@ def train():
         pct_start=0.1
     )
 
+    best_accuracy = 0.0
 
-    print("Training...")
+    print("......Starting Training......")
+    for epoch in range(num_epochs):
+        model.train()
+        running_loss = 0.0
+
+        progress_bar = tqdm(train_dataloader, desc=f"Epoch {epoch + 1}/{num_epochs}", unit="batch")
+
+        for data, target in progress_bar:
+            data, target = data.to(device), target.to(device)
+
+            if np.random.random() > 0.7:
+                data, target_a, target_b, lam = mixup_data(data, target)
+                data, target_a, target_b = data.to(device), target_a.to(device), target_b.to(device)
+                output = model(data)
+                loss = mixup_criterion(
+                    criterion,
+                    output,
+                    target_a,
+                    target_b,
+                    lam
+                )
+            else:
+                output = model(data)
+                loss = criterion(output, target)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+            scheduler.step()
+
+            running_loss += loss.item()
+            progress_bar.set_postfix({'loss': f'{loss.item():.4f}'})
+
+        avg_running_loss = running_loss / len(train_dataloader)
+        writer.add_scalar('Loss/train', avg_running_loss, epoch)
+        writer.add_scalar('Learning_Rate', optimizer.param_groups[0]['lr'], epoch)
+
+        model.eval()
+        correct = 0
+        total = 0
+        val_loss = 0
+
+        with torch.no_grad():
+            for data, target in val_dataloader:
+                data, target = data.to(device), target.to(device)
+                output = model(data)
+                loss = criterion(output, target)
+                val_loss += loss.item()
+
+                _, predicted = torch.max(output.data, 1)
+                total += target.size(0)
+                correct += (predicted == target).sum().item()
+
+        accuracy = 100 * correct / total
+        avg_val_loss = val_loss / len(val_dataloader)
+        writer.add_scalar('Loss/validation', avg_val_loss, epoch)
+        writer.add_scalar('Accuracy/validation', accuracy, epoch)
+
+        print(f"Epoch {epoch+1} Loss: {avg_running_loss:.4f},"
+              f" Val Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.2f}%")
+
+        if accuracy > best_accuracy:
+            best_accuracy = accuracy
+            torch.save({'model_state_dict': model.state_dict(),
+                        'accuracy': accuracy,
+                        'epoch': epoch,
+                        'classes': train_set.classes,
+                        }, "/models/model.pth")
+            print(f'New best model saved: {accuracy:.2f}%')
+    writer.close()
+    print(f"Training completed: Best accuracy: {best_accuracy:.2f}%")
+
+
 
 @app.local_entrypoint()
 def main():
