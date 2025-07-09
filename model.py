@@ -5,7 +5,7 @@ class ResidualBlock(nn.Module):
         super().__init__()
         self.conv1 = nn.Conv2d(in_channel, out_channel, 3, padding=1, stride=stride, bias=False)
         self.bn1 = nn.BatchNorm2d(out_channel)
-        self.conv2 = nn.Conv2d(in_channel, out_channel, 3, padding=1, stride=stride, bias=False)
+        self.conv2 = nn.Conv2d(out_channel, out_channel, 3, padding=1, bias=False)
         self.bn2 = nn.BatchNorm2d(out_channel)
 
         self.shortcut = nn.Sequential()

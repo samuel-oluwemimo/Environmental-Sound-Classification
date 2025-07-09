@@ -1,6 +1,3 @@
-import sys
-from importlib.metadata import metadata
-
 import modal
 import torch
 import torchaudio
