@@ -15,9 +15,9 @@ This project demonstrates an end-to-end solution for classifying audio signals u
 ### Technologies Used
 - Python: The primary programming language for the project.
 
-- PyTorch (or similar ML framework): For building and training the CNN model.
+- PyTorch: For building and training the CNN model.
 
-- Librosa, Torchaudio (or similar audio processing library): For audio loading, preprocessing, and spectrogram generation.
+- Librosa, Torchaudio: For audio loading, preprocessing, and spectrogram generation.
 
 - NumPy: For data manipulation.
 
