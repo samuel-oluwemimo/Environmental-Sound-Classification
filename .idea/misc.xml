@@ -3,5 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.13 (audio_cnn)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.13 (audio_cnn)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 virtualenv at C:\Users\Dell\PycharmProjects\audio_cnn\.venv" project-jdk-type="Python SDK" />
 </project>

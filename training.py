@@ -122,7 +122,7 @@ def train():
                              split="train", transform=train_transform)
     val_set = Esc50Dataset(root_dir=esc50_dir,
                              metadata_file=esc50_dir / "meta" / "esc50.csv",
-                             split="val", transform=val_transform)
+                             split="test", transform=val_transform)
 
     print(f"..........Training set length: {len(train_set)}")
     print(f"..........Validation set length: {len(val_set)}")
