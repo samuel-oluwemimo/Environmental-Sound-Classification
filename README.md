@@ -1,4 +1,7 @@
-## Audio Classification with CNNs, Modal, and Gradio
+## Audio Classification with CNNs, Modal, and Streamlit
+
+![Alt]( ./1.png)
+
 This project demonstrates an end-to-end solution for classifying audio signals using Convolutional Neural Networks (CNNs). The core idea involves converting audio into spectrograms, training a CNN on these visual representations, deploying the model for inference using Modal, and providing a user-friendly web interface with Gradio.
 
 ### Features
@@ -8,7 +11,7 @@ This project demonstrates an end-to-end solution for classifying audio signals u
 
 - Modal for Inference: Leverages Modal for efficient, scalable, and serverless deployment of the trained model for inference.
 
-- Gradio Dashboard: Provides an intuitive web interface for users to upload audio files and receive real-time classification predictions.
+- Streamlit: Provides an intuitive web interface for users to upload audio files and receive real-time classification predictions.
 
 - End-to-End Pipeline: Demonstrates a complete workflow from data preprocessing to model deployment and interactive demonstration.
 
@@ -23,6 +26,6 @@ This project demonstrates an end-to-end solution for classifying audio signals u
 
 - Modal: For serverless function deployment and model serving.
 
-- Gradio: For creating the interactive web dashboard.
+- Streamlit: For creating the interactive web dashboard.
 
 - Tensorboard: For visualizing training.
