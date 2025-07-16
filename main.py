@@ -25,15 +25,15 @@ model_volume = modal.Volume.from_name("esc-model")
 class AudioProcessor:
     def __init__(self, target_sample_rate=44100):
         self.transform = nn.Sequential(
-        T.MelSpectrogram(
-            sample_rate=target_sample_rate, # Use the target sample rate
-            n_fft=1024,
-            hop_length=512,
-            n_mels=128,
-            f_min=0,
-            f_max=target_sample_rate / 2 # f_max should be Nyquist frequency
-        ),
-        T.AmplitudeToDB())
+            T.MelSpectrogram(
+                sample_rate=target_sample_rate,  # Use the target sample rate here
+                n_fft=1024,
+                hop_length=512,
+                n_mels=128,
+                f_min=0,
+                f_max=target_sample_rate / 2  # f_max should be Nyquist frequency based on target_sample_rate
+            ),
+            T.AmplitudeToDB())
 
     def process_audio_chunk(self, audio_data):
         waveform = torch.from_numpy(audio_data).float()
@@ -49,7 +49,7 @@ class InferenceRequest(BaseModel):
     audio_data: str
 
 
-@app.cls(image=image, gpu="A10G", volumes={"/models": model_volume}, scaledown_window=15,)
+@app.cls(image=image, gpu="A10G", volumes={"/models": model_volume}, scaledown_window=15)
 class AudioClassifier:
     @modal.enter()
     def load_model(self):
@@ -66,8 +66,7 @@ class AudioClassifier:
         self.model.to(self.device)
         self.model.eval()
 
-        self.audio_processor = AudioProcessor(target_sample_rate=44100)
-
+        self.audio_processor = AudioProcessor()
         print("Model loaded on enter")
 
     @modal.fastapi_endpoint(method="POST")
