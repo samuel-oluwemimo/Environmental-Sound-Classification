@@ -1,5 +1,4 @@
-## Audio Classification with CNNs, Modal, and Streamlit
-
+## Environmental Sound Classification
 ![Alt]( ./1.png)
 
 This project demonstrates an end-to-end solution for classifying audio signals using Convolutional Neural Networks (CNNs). The core idea involves converting audio into spectrograms, training a CNN on these visual representations, deploying the model for inference using Modal, and providing a user-friendly web interface with Gradio.
