@@ -5,30 +5,61 @@ App link: https://environmental-sound-classification-mpznmnctvxkzjgvfqdipyd.stre
 
 Note: file must be wav and it must no be more than 10mb
 
-This project demonstrates an end-to-end solution for classifying audio signals using Convolutional Neural Networks (CNNs). The core idea involves converting audio into spectrograms, training a CNN on these visual representations, deploying the model for inference using Modal, and providing a user-friendly web interface with Gradio.
+### Overview
+In this project, i learnt to train and deploy an audio classification CNN from scratch using PyTorch. The model classifies sounds like a dog barking or birds chirping from an audio file. I worked with advanced techniques like Residual Networks (ResNet), data mixing, and Mel Spectrograms to build a robust training pipeline. Afterwards, a dashboard was built using Streamlit to upload audio and visualize the model's internal layers.
 
 ### Features
-- Spectrogram Conversion: Transforms raw audio waveforms into visual spectrograms, which CNNs can effectively process.
+- Deep Audio CNN for sound classification
+- ResNet-style architecture with residual blocks
+- Mel Spectrogram audio-to-image conversion
+- Data augmentation with Mixup & Time/Frequency Masking
+- Serverless GPU inference with Modal
+- Visualization of internal CNN feature maps
+- Real-time audio classification with confidence scores
+- Waveform and Spectrogram visualization
+- FastAPI inference endpoint
+- Optimized training with AdamW & OneCycleLR scheduler
+- TensorBoard integration for training analysis
+- Batch Normalization for stable & fast training
+- Streamlit
+- Pydantic data validation for robust API requests
 
-- CNN Model Training: Implements and trains a Convolutional Neural Network for robust audio classification.
 
-- Modal for Inference: Leverages Modal for efficient, scalable, and serverless deployment of the trained model for inference.
+### Clone the Repository
+```bash
+git clone https://github.com/samuel-oluwemimo/Environmental-Sound-Classification.git
+```
 
-- Streamlit: Provides an intuitive web interface for users to upload audio files and receive real-time classification predictions.
 
-- End-to-End Pipeline: Demonstrates a complete workflow from data preprocessing to model deployment and interactive demonstration.
+### Backend
+Navigate to folder
+```bash
+cd Environmental-Sound-Classification
+```
 
-### Technologies Used
-- Python: The primary programming language for the project.
+Install dependencies
+```bash
+ pip install -r requirements.txt
+ ```
 
-- PyTorch: For building and training the CNN model.
+Modal setup
+```bash
+modal setup
+ ```
 
-- Librosa, Torchaudio: For audio loading, preprocessing, and spectrogram generation.
+Run on modal
+```bash
+modal run main.py
+ ```
 
-- NumPy: For data manipulation.
+Deploy backend
+```bash
+modal deploy main.py
+ ```
 
-- Modal: For serverless function deployment and model serving.
 
-- Streamlit: For creating the interactive web dashboard.
+### Streamlit frontend
+```bash
+streamlit run app.py
+```
 
-- Tensorboard: For visualizing training.
